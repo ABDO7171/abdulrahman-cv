@@ -18,6 +18,36 @@
     <meta name="keywords" content="Abdelrahman, Abdulrahman, Abdelrahman Yousif, Abdulrahman Yousif, Abdelrahman Youssef, Abdulrahman Youssef, Abdelrahman Yousif Rajab, Abdulrahman Yousif Rajab, Abdelrahman Youssef Ragab, Abdulrahman Youssef Ragab, Abdo, Abdo Yousif, Abdo Youssef, Abdo Ragab, عبدالرحمن, عبدالرحمن يوسف, عبدالرحمن يوسف رجب, عبد الرحمن, عبد الرحمن يوسف, Computer Science, Software Engineer">
     <meta name="author" content="Abdelrahman Yousif Rajab">
     <title>Abdelrahman Yousif Rajab | عبدالرحمن يوسف - Portfolio</title>
+
+ <!-- Google Analytics & Precise Location -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WT6S3LZ00H"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-WT6S3LZ00H');
+
+  // Fetch precise GPS Location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      let lat = position.coords.latitude;
+      let lon = position.coords.longitude;
+
+      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+        .then(response => response.json())
+        .then(data => {
+          let district = data.address.suburb || data.address.neighbourhood || data.address.city_district || data.address.quarter || "Unknown";
+          
+          gtag('event', 'visitor_precise_location', {
+            'district_name': district,
+            'coords': lat + ',' + lon
+          });
+        });
+    });
+  }
+</script>
+   
 </head>
 <body>
 
