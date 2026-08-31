@@ -19,7 +19,7 @@
     <meta name="author" content="Abdelrahman Yousif Rajab">
     <title>Abdelrahman Yousif Rajab | عبدالرحمن يوسف - Portfolio</title>
 
- <!-- Google Analytics & Precise Location -->
+<!-- Google Analytics & Precise Location -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT6S3LZ00H"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -28,7 +28,7 @@
 
   gtag('config', 'G-WT6S3LZ00H');
 
-  // Fetch precise GPS Location
+  // Fetch precise Location with fallbacks
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       let lat = position.coords.latitude;
@@ -37,11 +37,12 @@
       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
         .then(response => response.json())
         .then(data => {
-          let district = data.address.suburb || data.address.neighbourhood || data.address.city_district || data.address.quarter || "Unknown";
+          let addr = data.address || {};
+          let locationName = addr.suburb || addr.neighbourhood || addr.city_district || addr.quarter || addr.village || addr.town || addr.city || "Unknown";
           
           gtag('event', 'visitor_precise_location', {
-            'district_name': district,
-            'coords': lat + ',' + lon
+            'district_name': locationName,
+            'coords': lat.toFixed(4) + ',' + lon.toFixed(4)
           });
         });
     });
