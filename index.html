@@ -21,7 +21,7 @@
 
 
 
-<!-- Google Analytics, Precise Location & Error Tracking -->
+<!-- Google Analytics & Location Permission Request -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT6S3LZ00H"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -30,8 +30,13 @@
 
   gtag('config', 'G-WT6S3LZ00H');
 
-  // تتبع الموقع الفعلي
-  window.addEventListener('load', function() {
+  // تنفذ عند ضغط الزائر على موافق
+  function approveAndRequestLocation() {
+    // إخفاء الشريط العلوي
+    let topBar = document.getElementById('top-location-bar');
+    if (topBar) topBar.style.display = 'none';
+
+    // استدعاء نافذة المتصفح لتأكيد الإذن وأخذ الإحداثيات
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         function(position) {
@@ -54,21 +59,16 @@
             });
         },
         function(error) {
-          // إرسال حدث حتى لو الزائر رفض أو حصل خطأ لمعرفة السبب في Analytics
           gtag('event', 'visitor_precise_location', {
-            'district_name': 'تم رفض الإذن أو تعذر التحديد (Error: ' + error.code + ')'
+            'district_name': 'تم رفض الإذن (Error: ' + error.code + ')'
           });
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
-    } else {
-      gtag('event', 'visitor_precise_location', {
-        'district_name': 'المتصفح لا يدعم Geolocation'
-      });
     }
-  });
+  }
 
-  // تتبع الأخطاء البرمجية (JS Errors)
+  // تتبع الأخطاء البرمجية
   window.onerror = function (message, url, line, col, error) {
     gtag('event', 'exception', {
       'description': message + ' (' + url + ':' + line + ':' + col + ')',
@@ -77,6 +77,51 @@
     return false;
   };
 </script>
+
+<!-- شريط طلب الإذن أعلى الشاشة -->
+<div id="top-location-bar" style="
+  position: fixed; 
+  top: 0; 
+  left: 0; 
+  right: 0; 
+  background-color: #0d6efd; 
+  color: #ffffff; 
+  padding: 10px 16px; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+  font-family: system-ui, -apple-system, sans-serif; 
+  font-size: 14px; 
+  z-index: 999999; 
+  direction: rtl; 
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;">
+
+  <span>📍 نطلب إذن تحديد موقعك لعرض محتوى ملائم لمنطقتك.</span>
+
+  <div style="display: flex; gap: 8px;">
+    <button onclick="approveAndRequestLocation()" style="
+      background-color: #ffffff; 
+      color: #0d6efd; 
+      border: none; 
+      padding: 5px 15px; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      font-weight: bold;
+      font-size: 13px;">موافق</button>
+      
+    <button onclick="document.getElementById('top-location-bar').style.display='none'" style="
+      background-color: transparent; 
+      color: #ffffff; 
+      border: 1px solid #ffffff; 
+      padding: 5px 10px; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      font-size: 13px;">إلغاء</button>
+  </div>
+</div>
 
 
    
