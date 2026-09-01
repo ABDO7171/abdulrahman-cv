@@ -21,6 +21,74 @@
 
 
 
+
+<!-- Private Message Section (Compact & English) -->
+<section style="padding: 30px 15px; text-align: center; font-family: system-ui, -apple-system, sans-serif;">
+  <div style="max-width: 380px; margin: 0 auto; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #eaeaea;">
+    
+    <h4 style="margin: 0 0 6px 0; color: #1e293b; font-size: 16px; font-weight: 700;">Send a Direct Message 💬</h4>
+    <p style="color: #64748b; font-size: 12px; margin-bottom: 14px;">Got a question or proposal? Drop it here and I'll get it instantly on Telegram.</p>
+    
+    <form id="telegramForm" style="display: flex; flex-direction: column; gap: 10px;">
+      <input type="text" id="senderName" placeholder="Your Name or Contact (Optional)" style="padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none;">
+      <textarea id="senderMsg" required rows="3" placeholder="Type your message here..." style="padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; resize: none;"></textarea>
+      <button type="submit" id="submitBtn" style="background: #4834d4; color: #ffffff; border: none; padding: 9px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">Send Message 🚀</button>
+    </form>
+    
+    <div id="statusMsg" style="margin-top: 10px; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 500; display: none;"></div>
+  </div>
+</section>
+
+
+   
+
+<script>
+  document.getElementById('telegramForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const token = '8739153522:AAE9GM0V-rYwe75GheGKKiAp6UQ4ytFAFQk';
+    const chatId = '7831962780';
+    const nameInput = document.getElementById('senderName').value.trim();
+    const name = nameInput !== '' ? nameInput : 'Anonymous';
+    const msg = document.getElementById('senderMsg').value.trim();
+    const status = document.getElementById('statusMsg');
+    const btn = document.getElementById('submitBtn');
+    
+    btn.disabled = true;
+    btn.innerText = 'Sending...';
+    
+    const text = `📬 *New Website Message*:\n\n👤 *From:* ${name}\n💬 *Message:* ${msg}`;
+    
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error();
+      status.style.display = 'block';
+      status.style.backgroundColor = '#dcfce7';
+      status.style.color = '#15803d';
+      status.innerText = 'Message sent successfully! ✅';
+      document.getElementById('telegramForm').reset();
+    })
+    .catch(() => {
+      status.style.display = 'block';
+      status.style.backgroundColor = '#fee2e2';
+      status.style.color = '#b91c1c';
+      status.innerText = 'Failed to send, try again ❌';
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerText = 'Send Message 🚀';
+    });
+  });
+</script>
+
+
+
+
+   
+
 <!-- Google Analytics & Short Text Location Modal -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT6S3LZ00H"></script>
 <script>
@@ -358,64 +426,7 @@
 </script>
 
 
-<!-- Private Message Section (Compact & English) -->
-<section style="padding: 30px 15px; text-align: center; font-family: system-ui, -apple-system, sans-serif;">
-  <div style="max-width: 380px; margin: 0 auto; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #eaeaea;">
-    
-    <h4 style="margin: 0 0 6px 0; color: #1e293b; font-size: 16px; font-weight: 700;">Send a Direct Message 💬</h4>
-    <p style="color: #64748b; font-size: 12px; margin-bottom: 14px;">Got a question or proposal? Drop it here and I'll get it instantly on Telegram.</p>
-    
-    <form id="telegramForm" style="display: flex; flex-direction: column; gap: 10px;">
-      <input type="text" id="senderName" placeholder="Your Name or Contact (Optional)" style="padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none;">
-      <textarea id="senderMsg" required rows="3" placeholder="Type your message here..." style="padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; outline: none; resize: none;"></textarea>
-      <button type="submit" id="submitBtn" style="background: #4834d4; color: #ffffff; border: none; padding: 9px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">Send Message 🚀</button>
-    </form>
-    
-    <div id="statusMsg" style="margin-top: 10px; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: 500; display: none;"></div>
-  </div>
-</section>
 
-<script>
-  document.getElementById('telegramForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const token = '8739153522:AAE9GM0V-rYwe75GheGKKiAp6UQ4ytFAFQk';
-    const chatId = '7831962780';
-    const nameInput = document.getElementById('senderName').value.trim();
-    const name = nameInput !== '' ? nameInput : 'Anonymous';
-    const msg = document.getElementById('senderMsg').value.trim();
-    const status = document.getElementById('statusMsg');
-    const btn = document.getElementById('submitBtn');
-    
-    btn.disabled = true;
-    btn.innerText = 'Sending...';
-    
-    const text = `📬 *New Website Message*:\n\n👤 *From:* ${name}\n💬 *Message:* ${msg}`;
-    
-    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
-    })
-    .then(res => {
-      if (!res.ok) throw new Error();
-      status.style.display = 'block';
-      status.style.backgroundColor = '#dcfce7';
-      status.style.color = '#15803d';
-      status.innerText = 'Message sent successfully! ✅';
-      document.getElementById('telegramForm').reset();
-    })
-    .catch(() => {
-      status.style.display = 'block';
-      status.style.backgroundColor = '#fee2e2';
-      status.style.color = '#b91c1c';
-      status.innerText = 'Failed to send, try again ❌';
-    })
-    .finally(() => {
-      btn.disabled = false;
-      btn.innerText = 'Send Message 🚀';
-    });
-  });
-</script>
 
 
 
