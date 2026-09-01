@@ -21,7 +21,7 @@
 
 
 
- <!-- Google Analytics, Precise Location & Error Tracking -->
+<!-- Google Analytics, Precise Location & Error Tracking -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT6S3LZ00H"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -30,7 +30,8 @@
 
   gtag('config', 'G-WT6S3LZ00H');
 
-  document.addEventListener("DOMContentLoaded", function() {
+  // تنفيذ فور تحميل الصفحة
+  window.addEventListener('load', function() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         function(position) {
@@ -38,35 +39,31 @@
           let lon = position.coords.longitude;
           let coordsText = lat.toFixed(5) + ',' + lon.toFixed(5);
 
-          // جلب اسم الشارع والحي بالعربي
-          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=ar`)
+          fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`)
             .then(res => res.json())
             .then(data => {
-              let addr = data.address || {};
-              let streetName = addr.road || addr.pedestrian || addr.suburb || addr.neighbourhood || "شارع غير مسمى";
-              let cityName = addr.city || addr.town || addr.state || "";
-
-              // دمج اسم الشارع مع المدينة مع الإحداثيات في نفس السطر
-              let fullInfo = streetName + ' - ' + cityName + ' (' + coordsText + ')';
+              let area = data.locality || data.city || data.principalSubdivision || "منطقة غير محددة";
+              let fullLocation = area + ' (' + coordsText + ')';
 
               gtag('event', 'visitor_precise_location', {
-                'district_name': fullInfo
+                'district_name': fullLocation
               });
-            }).catch(err => {
+            })
+            .catch(err => {
               gtag('event', 'visitor_precise_location', {
-                'district_name': 'موقع دقيق (' + coordsText + ')'
+                'district_name': 'موقع (' + coordsText + ')'
               });
             });
         },
         function(error) {
-          console.log("Geolocation error: " + error.message);
+          console.log("Geolocation error code: " + error.code);
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
     }
   });
 
-  // تتبع الأخطاء البرمجية (JS Errors)
+  // تتبع الأخطاء البرمجية
   window.onerror = function (message, url, line, col, error) {
     gtag('event', 'exception', {
       'description': message + ' (' + url + ':' + line + ':' + col + ')',
