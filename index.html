@@ -28,21 +28,19 @@
 
   gtag('config', 'G-WT6S3LZ00H');
 
-  // Fetch precise Location with fallbacks
+  // Fetch precise Location in Arabic directly
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       let lat = position.coords.latitude;
       let lon = position.coords.longitude;
 
-      fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+      fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`)
         .then(response => response.json())
         .then(data => {
-          let addr = data.address || {};
-          let locationName = addr.suburb || addr.neighbourhood || addr.city_district || addr.quarter || addr.village || addr.town || addr.city || "Unknown";
+          let area = data.locality || data.city || data.principalSubdivision || "مكان غير محدد";
           
           gtag('event', 'visitor_precise_location', {
-            'district_name': locationName,
-            'coords': lat.toFixed(4) + ',' + lon.toFixed(4)
+            'district_name': area
           });
         });
     });
