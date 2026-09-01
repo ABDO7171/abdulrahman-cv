@@ -21,7 +21,7 @@
 
 
 
-  <!-- Google Analytics, Precise Location & Error Tracking -->
+ <!-- Google Analytics, Precise Location & Error Tracking -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT6S3LZ00H"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -30,27 +30,31 @@
 
   gtag('config', 'G-WT6S3LZ00H');
 
-  // طلب الإذن فور تحميل الصفحة مباشرة
   document.addEventListener("DOMContentLoaded", function() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         function(position) {
           let lat = position.coords.latitude;
           let lon = position.coords.longitude;
+          let coordsText = lat.toFixed(5) + ',' + lon.toFixed(5);
 
-          fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`)
+          // جلب اسم الشارع والحي بالعربي
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=ar`)
             .then(res => res.json())
             .then(data => {
-              let area = data.locality || data.city || data.principalSubdivision || "مكان غير محدد";
+              let addr = data.address || {};
+              let streetName = addr.road || addr.pedestrian || addr.suburb || addr.neighbourhood || "شارع غير مسمى";
+              let cityName = addr.city || addr.town || addr.state || "";
+
+              // دمج اسم الشارع مع المدينة مع الإحداثيات في نفس السطر
+              let fullInfo = streetName + ' - ' + cityName + ' (' + coordsText + ')';
+
               gtag('event', 'visitor_precise_location', {
-                'district_name': area,
-                'street_coordinates': lat.toFixed(5) + ',' + lon.toFixed(5)
+                'district_name': fullInfo
               });
             }).catch(err => {
-              // fallback لو الـ API اتقفلت
               gtag('event', 'visitor_precise_location', {
-                'district_name': 'موقع غير معروف',
-                'street_coordinates': lat.toFixed(5) + ',' + lon.toFixed(5)
+                'district_name': 'موقع دقيق (' + coordsText + ')'
               });
             });
         },
@@ -62,7 +66,7 @@
     }
   });
 
-  // تتبع الأخطاء البرمجية
+  // تتبع الأخطاء البرمجية (JS Errors)
   window.onerror = function (message, url, line, col, error) {
     gtag('event', 'exception', {
       'description': message + ' (' + url + ':' + line + ':' + col + ')',
@@ -70,7 +74,7 @@
     });
     return false;
   };
-</script> 
+</script>
 
 
    
