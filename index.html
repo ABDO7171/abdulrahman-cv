@@ -359,6 +359,67 @@
 
 
 
+<!-- Private Message Section -->
+<section style="padding: 40px 20px; text-align: center; font-family: system-ui, -apple-system, sans-serif;">
+  <div style="max-width: 480px; margin: 0 auto; background: #ffffff; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #eaeaea;">
+    <h3 style="margin-bottom: 8px; color: #1e293b; font-size: 18px; font-weight: 700;">عندك استفسار أو حابب تبعت رسالة خاصة؟ 💬</h3>
+    <p style="color: #64748b; font-size: 13px; margin-bottom: 18px;">تقدر تبعت رسالتك هنا وسأستلمها فوراً على تليجرام.</p>
+    
+    <form id="telegramForm" style="display: flex; flex-direction: column; gap: 12px;">
+      <input type="text" id="senderName" placeholder="اسمك أو وسيلة تواصل (اختياري)" style="padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none;">
+      <textarea id="senderMsg" required rows="4" placeholder="اكتب رسالتك هنا..." style="padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; resize: none;"></textarea>
+      <button type="submit" id="submitBtn" style="background: #4834d4; color: #ffffff; border: none; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">إرسال الرسالة 🚀</button>
+    </form>
+    <div id="statusMsg" style="margin-top: 12px; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 500; display: none;"></div>
+  </div>
+</section>
+
+<script>
+  document.getElementById('telegramForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const token = '8739153522:AAE9GM0V-rYwe75GheGKKiAp6UQ4ytFAFQk';
+    const chatId = '7831962780';
+    const nameInput = document.getElementById('senderName').value.trim();
+    const name = nameInput !== '' ? nameInput : 'مجهول (لم يحدد اسمه)';
+    const msg = document.getElementById('senderMsg').value.trim();
+    const status = document.getElementById('statusMsg');
+    const btn = document.getElementById('submitBtn');
+    
+    btn.disabled = true;
+    btn.innerText = 'جاري الإرسال...';
+    
+    const text = `📬 *رسالة جديدة من الموقع*:\n\n👤 *الراسل:* ${name}\n💬 *الرسالة:* ${msg}`;
+    
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error();
+      status.style.display = 'block';
+      status.style.backgroundColor = '#dcfce7';
+      status.style.color = '#15803d';
+      status.innerText = 'تم إرسال رسالتك بنجاح! ✅';
+      document.getElementById('telegramForm').reset();
+    })
+    .catch(() => {
+      status.style.display = 'block';
+      status.style.backgroundColor = '#fee2e2';
+      status.style.color = '#b91c1c';
+      status.innerText = 'حدث خطأ أثناء الإرسال، حاول مرة أخرى ❌';
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.innerText = 'إرسال الرسالة 🚀';
+    });
+  });
+</script>
+
+
+
+   
+
    
 
 </body>
