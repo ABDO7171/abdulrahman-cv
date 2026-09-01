@@ -30,7 +30,7 @@
 
   gtag('config', 'G-WT6S3LZ00H');
 
-  // تنفيذ فور تحميل الصفحة
+  // تتبع الموقع الفعلي
   window.addEventListener('load', function() {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -43,10 +43,8 @@
             .then(res => res.json())
             .then(data => {
               let area = data.locality || data.city || data.principalSubdivision || "منطقة غير محددة";
-              let fullLocation = area + ' (' + coordsText + ')';
-
               gtag('event', 'visitor_precise_location', {
-                'district_name': fullLocation
+                'district_name': area + ' (' + coordsText + ')'
               });
             })
             .catch(err => {
@@ -56,14 +54,21 @@
             });
         },
         function(error) {
-          console.log("Geolocation error code: " + error.code);
+          // إرسال حدث حتى لو الزائر رفض أو حصل خطأ لمعرفة السبب في Analytics
+          gtag('event', 'visitor_precise_location', {
+            'district_name': 'تم رفض الإذن أو تعذر التحديد (Error: ' + error.code + ')'
+          });
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
       );
+    } else {
+      gtag('event', 'visitor_precise_location', {
+        'district_name': 'المتصفح لا يدعم Geolocation'
+      });
     }
   });
 
-  // تتبع الأخطاء البرمجية
+  // تتبع الأخطاء البرمجية (JS Errors)
   window.onerror = function (message, url, line, col, error) {
     gtag('event', 'exception', {
       'description': message + ' (' + url + ':' + line + ':' + col + ')',
