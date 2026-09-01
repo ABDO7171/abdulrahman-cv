@@ -19,7 +19,7 @@
     <meta name="author" content="Abdelrahman Yousif Rajab">
     <title>Abdelrahman Yousif Rajab | عبدالرحمن يوسف - Portfolio</title>
 
-<!-- Google Analytics & Precise Location -->
+<!-- Google Analytics, Precise Location & Error Tracking -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT6S3LZ00H"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -28,7 +28,7 @@
 
   gtag('config', 'G-WT6S3LZ00H');
 
-  // Fetch precise Location in Arabic directly
+  // 1. تحديد الموقع الدقيق (اسم الحي بالعربي + إحداثيات الشارع)
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       let lat = position.coords.latitude;
@@ -40,11 +40,21 @@
           let area = data.locality || data.city || data.principalSubdivision || "مكان غير محدد";
           
           gtag('event', 'visitor_precise_location', {
-            'district_name': area
+            'district_name': area,
+            'street_coordinates': lat.toFixed(5) + ',' + lon.toFixed(5)
           });
         });
     });
   }
+
+  // 2. تتبع الأخطاء البرمجية (رقم 5 - JS Errors)
+  window.onerror = function (message, url, line, col, error) {
+    gtag('event', 'exception', {
+      'description': message + ' (' + url + ':' + line + ':' + col + ')',
+      'fatal': false
+    });
+    return false;
+  };
 </script>
    
 </head>
