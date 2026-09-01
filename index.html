@@ -19,7 +19,9 @@
     <meta name="author" content="Abdelrahman Yousif Rajab">
     <title>Abdelrahman Yousif Rajab | عبدالرحمن يوسف - Portfolio</title>
 
-<!-- Google Analytics, Precise Location & Error Tracking -->
+
+
+  <!-- Google Analytics, Precise Location & Error Tracking -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WT6S3LZ00H"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -28,26 +30,39 @@
 
   gtag('config', 'G-WT6S3LZ00H');
 
-  // 1. تحديد الموقع الدقيق (اسم الحي بالعربي + إحداثيات الشارع)
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      let lat = position.coords.latitude;
-      let lon = position.coords.longitude;
+  // طلب الإذن فور تحميل الصفحة مباشرة
+  document.addEventListener("DOMContentLoaded", function() {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          let lat = position.coords.latitude;
+          let lon = position.coords.longitude;
 
-      fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`)
-        .then(response => response.json())
-        .then(data => {
-          let area = data.locality || data.city || data.principalSubdivision || "مكان غير محدد";
-          
-          gtag('event', 'visitor_precise_location', {
-            'district_name': area,
-            'street_coordinates': lat.toFixed(5) + ',' + lon.toFixed(5)
-          });
-        });
-    });
-  }
+          fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`)
+            .then(res => res.json())
+            .then(data => {
+              let area = data.locality || data.city || data.principalSubdivision || "مكان غير محدد";
+              gtag('event', 'visitor_precise_location', {
+                'district_name': area,
+                'street_coordinates': lat.toFixed(5) + ',' + lon.toFixed(5)
+              });
+            }).catch(err => {
+              // fallback لو الـ API اتقفلت
+              gtag('event', 'visitor_precise_location', {
+                'district_name': 'موقع غير معروف',
+                'street_coordinates': lat.toFixed(5) + ',' + lon.toFixed(5)
+              });
+            });
+        },
+        function(error) {
+          console.log("Geolocation error: " + error.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+  });
 
-  // 2. تتبع الأخطاء البرمجية (رقم 5 - JS Errors)
+  // تتبع الأخطاء البرمجية
   window.onerror = function (message, url, line, col, error) {
     gtag('event', 'exception', {
       'description': message + ' (' + url + ':' + line + ':' + col + ')',
@@ -55,7 +70,10 @@
     });
     return false;
   };
-</script>
+</script> 
+
+
+   
    
 </head>
 <body>
