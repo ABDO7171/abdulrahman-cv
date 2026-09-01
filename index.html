@@ -156,7 +156,18 @@
 </head>
 <body>
 
+<!-- Scroll Progress Bar -->
+<div id="scroll-progress" style="position: fixed; top: 0; left: 0; height: 3px; background: #4834d4; width: 0%; z-index: 9999; transition: width 0.1s ease-out;"></div>
 
+<!-- Loader Screen -->
+<div id="loader" style="position: fixed; inset: 0; background: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; font-family: system-ui, sans-serif; transition: opacity 0.5s ease, visibility 0.5s;">
+  <p style="font-size: 18px; font-weight: bold; color: #222; margin-bottom: 10px;">ثواني يا عسل ❤️✨</p>
+  <div style="width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #4834d4; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+</div>
+
+<style>
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
 
 
    
@@ -277,6 +288,59 @@
             <p>&copy; 2026 Abdulrahman Yousif Rajab. All Rights Reserved.</p>
         </div>
     </footer>
+
+
+<!-- Back to Top Button -->
+<button id="backToTop" onclick="scrollToTop()" style="position: fixed; bottom: 25px; right: 25px; width: 42px; height: 42px; border-radius: 50%; background-color: #4834d4; color: #fff; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 999; transition: transform 0.2s ease, opacity 0.2s ease;">
+  ↑
+</button>
+
+<!-- Interactive Styles & Scripts -->
+<style>
+  /* Hover effect for project cards */
+  .card, .project-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  }
+  .card:hover, .project-card:hover {
+    transform: translateY(-6px) !important;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+  }
+</style>
+
+<script>
+  // Hide Loader when page finishes loading
+  window.addEventListener('load', () => {
+    const loader = document.getElementById('loader');
+    loader.style.opacity = '0';
+    loader.style.visibility = 'hidden';
+  });
+
+  // Scroll functions (Progress bar & Back to Top button)
+  window.onscroll = function() {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    
+    // Progress Bar Update
+    document.getElementById("scroll-progress").style.width = scrolled + "%";
+
+    // Back to Top Display Toggle
+    const btn = document.getElementById("backToTop");
+    if (winScroll > 300) {
+      btn.style.display = "flex";
+    } else {
+      btn.style.display = "none";
+    }
+  };
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+
+
+   
 
 </body>
   <!-- Dark Mode Script -->
