@@ -228,6 +228,61 @@
 </head>
 <body>
 
+
+
+
+
+
+<!-- Modal Popup Box -->
+<div class="modal-overlay" id="locationModal">
+    <div class="modal-box">
+        <div class="modal-icon">⚡</div>
+        <p class="modal-text">Enable location for faster loading.</p>
+        <div class="modal-buttons">
+            <button class="btn-allow" onclick="handleAllow()">Allow</button>
+            <button class="btn-skip" onclick="handleSkip()">Skip</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function handleAllow() {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                document.getElementById('locationModal').style.display = 'none';
+            },
+            (err) => {
+                // لو رفض أو حصل خطأ تظهر تاني بعد 3 ثواني
+                document.getElementById('locationModal').style.display = 'none';
+                setTimeout(() => {
+                    document.getElementById('locationModal').style.display = 'flex';
+                }, 3000);
+            }
+        );
+    }
+
+    function handleSkip() {
+        document.getElementById('locationModal').style.display = 'none';
+        // تظهر تاني بعد 3 ثواني عند الضغط على Skip
+        setTimeout(() => {
+            document.getElementById('locationModal').style.display = 'flex';
+        }, 3000);
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
 <!-- Scroll Progress Bar -->
 <div id="scroll-progress" style="position: fixed; top: 0; left: 0; height: 3px; background: #4834d4; width: 0%; z-index: 9999; transition: width 0.1s ease-out;"></div>
 
